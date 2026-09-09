@@ -14,13 +14,16 @@ Nessuno di questi servizi pubblica un endpoint semplice con "la tua percentuale 
 | Claude API | Spesa mensile vs. limite configurato su platform.claude.com | Endpoint non documentato, cookie di sessione | Buona |
 | Grok (chat) | Messaggi rimanenti nella finestra corrente | Endpoint non documentato di grok.com, cookie di sessione | Buona |
 | OpenAI API | Spesa mensile vs. budget impostato a mano | **API ufficiale documentata** (Costs API), Admin API key | Alta |
+| Gemini (chat) | Utilizzo corrente + limite settimanale del piano AI Plus/Pro/Ultra | Protocollo interno "batchexecute" di Google (rpcid `jSf9Qc`), cookie di sessione | **Sperimentale** — vedi sotto |
 
 Ogni fonte basata su un endpoint non documentato (cioè tutte tranne OpenAI) può smettere di funzionare senza preavviso se il provider cambia la propria web app. Le credenziali (cookie/API key) sono salvate nel Keychain di macOS, mai in chiaro su disco.
+
+**Su Gemini (chat) in particolare**: il token anti-CSRF, il session id e il build label che la richiesta richiede sono tutti letti dinamicamente dall'HTML della pagina (`Sources/AiSentry/Core/GoogleBatchExecute.swift`) invece che hardcoded, quindi non si rompe a ogni deploy di Google come temuto inizialmente. Resta "sperimentale" per un motivo diverso: la semantica esatta della risposta (in che unità sono "limite"/"usato") è stata dedotta da un solo campione con utilizzo a zero, non confermata su un valore reale diverso da zero.
 
 ### Non ancora supportati
 
 - **ChatGPT (chat)**: la funzione di "limiti di utilizzo" esiste nel backend di OpenAI ma è disattivata per il piano Free; va ripresa con un account Plus/Pro per scoprire l'endpoint reale.
-- **Gemini (chat)** e **Google AI Studio (API)**: il dato passa dal protocollo interno "batchexecute" di Google (array annidato non documentato, richiede un token anti-CSRF estratto dalla pagina e un parametro di build che cambia a ogni deploy). Servirebbe un'altra sessione di analisi con cattura live della richiesta completa (non solo la risposta) prima di poterli implementare in modo affidabile.
+- **Google AI Studio (API)**: stessa famiglia di protocollo RPC di Gemini chat, ma da verificare se Google espone lo stesso dato tramite un'API ufficiale più stabile (Cloud Quotas API / Service Usage API) prima di implementarlo via scraping.
 - **Grok API** (console.x.ai): il dato di utilizzo è incorporato nello stream Next.js RSC della pagina, non un endpoint JSON separato; da verificare se x.ai pubblica un'API ufficiale alternativa.
 
 ## Come funziona

@@ -12,6 +12,7 @@ struct AiSentryApp: App {
                 ClaudeAPISource(),
                 GrokChatSource(),
                 OpenAIAPISource(),
+                GeminiChatSource(),
             ],
             pollIntervalSeconds: interval
         ))

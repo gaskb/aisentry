@@ -34,6 +34,44 @@ enum AuthenticatedClient {
         return try JSONSerialization.jsonObject(with: data)
     }
 
+    static func getText(
+        url: URL,
+        cookie: String? = nil,
+        extraHeaders: [String: String] = [:]
+    ) async throws -> String {
+        var request = URLRequest(url: url)
+        apply(cookie: cookie, bearerToken: nil, extraHeaders: extraHeaders, to: &request)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try validate(response)
+        guard let text = String(data: data, encoding: .utf8) else {
+            throw UsageSourceError.decoding("non-utf8 response")
+        }
+        return text
+    }
+
+    /// For endpoints that expect `application/x-www-form-urlencoded`, not JSON — e.g.
+    /// Google's internal "batchexecute" RPC protocol.
+    static func postForm(
+        url: URL,
+        formBody: String,
+        cookie: String? = nil,
+        extraHeaders: [String: String] = [:]
+    ) async throws -> String {
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.httpBody = Data(formBody.utf8)
+        request.setValue("application/x-www-form-urlencoded;charset=UTF-8", forHTTPHeaderField: "Content-Type")
+        apply(cookie: cookie, bearerToken: nil, extraHeaders: extraHeaders, to: &request)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try validate(response)
+        guard let text = String(data: data, encoding: .utf8) else {
+            throw UsageSourceError.decoding("non-utf8 response")
+        }
+        return text
+    }
+
     /// Several of these sites sit behind bot-detection (Cloudflare et al.) that 403s
     /// any request without a browser-looking User-Agent, even with a valid cookie.
     private static let browserUserAgent =
