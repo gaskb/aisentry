@@ -27,6 +27,11 @@ struct AiSentryApp: App {
         }
         .menuBarExtraStyle(.menu)
 
+        Window("Info su AiSentry", id: "about") {
+            AboutView()
+        }
+        .windowResizability(.contentSize)
+
         Settings {
             SettingsView(monitor: monitor)
         }

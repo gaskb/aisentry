@@ -3,6 +3,7 @@ import SwiftUI
 struct MenuContentView: View {
     @ObservedObject var monitor: UsageMonitor
     @Environment(\.openSettings) private var openSettings
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -24,9 +25,14 @@ struct MenuContentView: View {
 
             Button("Impostazioni…") {
                 openSettings()
-                bringSettingsWindowToFront()
+                bringWindowToFront(matching: "Settings")
             }
             .keyboardShortcut(",")
+
+            Button("Info su AiSentry…") {
+                openWindow(id: "about")
+                bringWindowToFront(matching: "about")
+            }
 
             Divider()
 
@@ -37,19 +43,19 @@ struct MenuContentView: View {
         .padding(4)
     }
 
-    /// `openSettings()` alone leaves the window visible but not "key" when launched
-    /// as a menu-bar-only app that was never the frontmost app (e.g. via `swift run`
-    /// from Terminal) — clicks land, but the keyboard/paste never reaches the fields.
-    /// Forcing activation + makeKey after SwiftUI has had a beat to create the window
-    /// works around it.
-    private func bringSettingsWindowToFront() {
+    /// `openSettings()`/`openWindow()` alone leave the window visible but not "key"
+    /// when launched as a menu-bar-only app that was never the frontmost app (e.g. via
+    /// `swift run` from Terminal) — clicks land, but the keyboard/paste never reaches
+    /// the fields. Forcing activation + makeKey after SwiftUI has had a beat to create
+    /// the window works around it.
+    private func bringWindowToFront(matching identifierSubstring: String) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             NSApp.activate(ignoringOtherApps: true)
-            let settingsWindow = NSApp.windows.first {
-                $0.identifier?.rawValue.contains("Settings") == true
+            let window = NSApp.windows.first {
+                $0.identifier?.rawValue.localizedCaseInsensitiveContains(identifierSubstring) == true
             } ?? NSApp.windows.first { $0.canBecomeKey }
-            settingsWindow?.makeKeyAndOrderFront(nil)
-            settingsWindow?.orderFrontRegardless()
+            window?.makeKeyAndOrderFront(nil)
+            window?.orderFrontRegardless()
         }
     }
 }

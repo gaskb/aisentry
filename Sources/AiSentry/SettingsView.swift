@@ -21,14 +21,6 @@ struct SettingsView: View {
                 .onChange(of: pollIntervalSeconds) { _, newValue in
                     monitor.pollIntervalSeconds = newValue
                 }
-
-                Text("AiSentry è gratis. Se ti torna utile, sentiti libero di [offrirmi un caffè ☕](https://ko-fi.com/gaskb).")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                Text("Versione \(AppVersion.string)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
             }
             .formStyle(.grouped)
             .padding()
