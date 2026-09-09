@@ -43,6 +43,9 @@ enum UsageSourceError: LocalizedError {
         case .missingCredentials:
             return "Credenziali mancanti"
         case .http(let code):
+            if code == 401 || code == 403 {
+                return "Sessione scaduta (\(code)) — vai su Impostazioni e ripeti la procedura per copiare il cookie."
+            }
             return "Errore HTTP \(code)"
         case .decoding(let detail):
             return "Risposta inattesa (\(detail))"
