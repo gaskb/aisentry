@@ -34,12 +34,19 @@ enum AuthenticatedClient {
         return try JSONSerialization.jsonObject(with: data)
     }
 
+    /// Several of these sites sit behind bot-detection (Cloudflare et al.) that 403s
+    /// any request without a browser-looking User-Agent, even with a valid cookie.
+    private static let browserUserAgent =
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15"
+
     private static func apply(
         cookie: String?,
         bearerToken: String?,
         extraHeaders: [String: String],
         to request: inout URLRequest
     ) {
+        request.setValue(browserUserAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue("application/json, text/plain, */*", forHTTPHeaderField: "Accept")
         if let cookie, !cookie.isEmpty {
             request.setValue(cookie, forHTTPHeaderField: "Cookie")
         }
