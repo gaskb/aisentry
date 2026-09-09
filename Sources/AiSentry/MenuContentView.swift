@@ -23,6 +23,7 @@ struct MenuContentView: View {
             }
 
             Button("Impostazioni…") {
+                NSApp.activate(ignoringOtherApps: true)
                 openSettings()
             }
             .keyboardShortcut(",")

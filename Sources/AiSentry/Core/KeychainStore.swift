@@ -4,7 +4,7 @@ import Security
 /// Stores provider credentials (cookies, API keys) in the macOS Keychain rather than
 /// UserDefaults/plist, since those are plaintext on disk.
 enum KeychainStore {
-    private static let service = "net.gaskb.usagesentry"
+    private static let service = "net.gaskb.aisentry"
 
     private static func account(providerId: String, field: String) -> String {
         "\(providerId).\(field)"

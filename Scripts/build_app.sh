@@ -1,14 +1,14 @@
 #!/bin/bash
 set -euo pipefail
 
-APP_NAME="UsageSentry"
-BUNDLE_ID="net.gaskb.usagesentry"
+APP_NAME="AiSentry"
+BUNDLE_ID="net.gaskb.aisentry"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="$ROOT_DIR/.build/release"
 DIST_DIR="$ROOT_DIR/dist"
 APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
 
-VERSION=$(grep -oE '"[0-9]+\.[0-9]+\.[0-9]+"' "$ROOT_DIR/Sources/UsageSentry/Version.swift" | tr -d '"')
+VERSION=$(grep -oE '"[0-9]+\.[0-9]+\.[0-9]+"' "$ROOT_DIR/Sources/AiSentry/Version.swift" | tr -d '"')
 COPYRIGHT_YEAR=$(date +%Y)
 
 echo "Building $APP_NAME $VERSION (release)..."

@@ -2,14 +2,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "UsageSentry",
+    name: "AiSentry",
     defaultLocalization: "en",
     platforms: [
         .macOS(.v14)
     ],
     targets: [
         .executableTarget(
-            name: "UsageSentry"
+            name: "AiSentry"
         ),
     ],
     swiftLanguageModes: [.v6]

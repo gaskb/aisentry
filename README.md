@@ -1,10 +1,10 @@
-# UsageSentry
+# AiSentry
 
 App per la barra menu di macOS che mostra, in un colpo d'occhio, quanto hai consumato dei tuoi piani/API di AI: Claude, OpenAI e Grok per ora, con un'architettura pensata per aggiungerne altri.
 
 ## Perché
 
-Nessuno di questi servizi pubblica un endpoint semplice con "la tua percentuale di utilizzo": alcuni la mostrano solo nella loro web app (Claude, Grok), altri solo tramite un'API ufficiale pensata per la fatturazione (OpenAI). UsageSentry normalizza tutto in un'unica vista, interrogando periodicamente ogni provider e mostrando la percentuale peggiore nella barra menu.
+Nessuno di questi servizi pubblica un endpoint semplice con "la tua percentuale di utilizzo": alcuni la mostrano solo nella loro web app (Claude, Grok), altri solo tramite un'API ufficiale pensata per la fatturazione (OpenAI). AiSentry normalizza tutto in un'unica vista, interrogando periodicamente ogni provider e mostrando la percentuale peggiore nella barra menu.
 
 ## Provider supportati
 
@@ -26,7 +26,7 @@ Ogni fonte basata su un endpoint non documentato (cioè tutte tranne OpenAI) pu�
 ## Come funziona
 
 - Swift + SwiftUI, `MenuBarExtra` (macOS 14+), stessa impostazione di [PingSentry](https://gitlab.gaskb.net/root/pingsentry).
-- Ogni provider implementa il protocollo `UsageSource` (`Sources/UsageSentry/Core/UsageModels.swift`): dichiara i campi che gli servono (cookie, API key, ID organizzazione, budget) e restituisce una lista di `UsageMetric` (percentuale + dettaglio testuale).
+- Ogni provider implementa il protocollo `UsageSource` (`Sources/AiSentry/Core/UsageModels.swift`): dichiara i campi che gli servono (cookie, API key, ID organizzazione, budget) e restituisce una lista di `UsageMetric` (percentuale + dettaglio testuale).
 - `UsageMonitor` interroga tutte le fonti abilitate in parallelo a intervalli regolari (default 10 minuti, configurabile) e tiene lo stato per la UI.
 - Le Impostazioni generano automaticamente un form per ogni provider a partire dai campi richiesti — aggiungere un nuovo provider non tocca la UI, basta un nuovo file in `Providers/` che conforma `UsageSource`.
 
@@ -37,7 +37,7 @@ Per ognuno serve copiare un cookie di sessione (o una API key) dagli Strumenti d
 1. Apri le Impostazioni del sito nel browser (es. claude.ai → Impostazioni → Utilizzo).
 2. Apri gli Strumenti di sviluppo → scheda Network, ricarica la pagina.
 3. Trova la richiesta indicata nella tabella qui sopra (es. `.../usage` per Claude), tasto destro → Copy → Copy request headers (o simile).
-4. Incolla l'intero valore dell'header `Cookie` nel campo corrispondente nelle Impostazioni di UsageSentry.
+4. Incolla l'intero valore dell'header `Cookie` nel campo corrispondente nelle Impostazioni di AiSentry.
 5. Per Claude, l'ID organizzazione è visibile nell'URL della stessa richiesta (`/api/organizations/<questo>/usage`).
 
 Il cookie scade periodicamente (dipende dal provider): quando una fonte inizia a dare errore, ripeti la procedura.
@@ -61,4 +61,4 @@ Per un bundle `.app` distribuibile (firmato ad-hoc, non notarizzato):
 
 [MIT](LICENSE) — do whatever you want with it, just keep the copyright notice.
 
-UsageSentry è gratis. Se ti torna utile, sentiti libero di [offrirmi un caffè ☕](https://ko-fi.com/gaskb).
+AiSentry è gratis. Se ti torna utile, sentiti libero di [offrirmi un caffè ☕](https://ko-fi.com/gaskb).

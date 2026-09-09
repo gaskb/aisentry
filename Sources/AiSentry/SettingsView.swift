@@ -22,7 +22,7 @@ struct SettingsView: View {
                     monitor.pollIntervalSeconds = newValue
                 }
 
-                Text("UsageSentry è gratis. Se ti torna utile, sentiti libero di [offrirmi un caffè ☕](https://ko-fi.com/gaskb).")
+                Text("AiSentry è gratis. Se ti torna utile, sentiti libero di [offrirmi un caffè ☕](https://ko-fi.com/gaskb).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct UsageSentryApp: App {
+struct AiSentryApp: App {
     @StateObject private var monitor: UsageMonitor
 
     init() {
