@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject var monitor: UsageMonitor
     @AppStorage("pollIntervalSeconds") private var pollIntervalSeconds: Double = 600
+    @AppStorage("notificationThresholdPercent") private var notificationThresholdPercent: Double = 90
 
     var body: some View {
         TabView {
@@ -21,6 +22,13 @@ struct SettingsView: View {
                 .onChange(of: pollIntervalSeconds) { _, newValue in
                     monitor.pollIntervalSeconds = newValue
                 }
+
+                Stepper(
+                    "Avvisa oltre: \(Int(notificationThresholdPercent))%",
+                    value: $notificationThresholdPercent,
+                    in: 50...100,
+                    step: 5
+                )
             }
             .formStyle(.grouped)
             .padding()

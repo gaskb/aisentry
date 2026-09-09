@@ -24,6 +24,9 @@ final class UsageMonitor: ObservableObject {
 
     private let sources: [UsageSource]
     private var loopTask: Task<Void, Never>?
+    /// Metrics currently over the notification threshold, so we notify once per
+    /// breach instead of on every poll while it stays high.
+    private var notifiedMetricKeys: Set<String> = []
 
     init(sources: [UsageSource], pollIntervalSeconds: Double = 600) {
         self.sources = sources
@@ -48,6 +51,7 @@ final class UsageMonitor: ObservableObject {
     }
 
     func start() {
+        NotificationManager.requestAuthorizationIfNeeded()
         restart()
     }
 
@@ -73,9 +77,28 @@ final class UsageMonitor: ObservableObject {
             statuses[index].metrics = metrics
             statuses[index].lastError = nil
             statuses[index].lastUpdated = Date()
+            checkThreshold(providerId: providerId, displayName: source.displayName, metrics: metrics)
         } catch {
             statuses[index].lastError = error.localizedDescription
             statuses[index].lastUpdated = Date()
+        }
+    }
+
+    private func checkThreshold(providerId: String, displayName: String, metrics: [UsageMetric]) {
+        let threshold = UserDefaults.standard.object(forKey: "notificationThresholdPercent") as? Double ?? 90
+        for metric in metrics {
+            let key = "\(providerId).\(metric.id)"
+            guard let percent = metric.percent else { continue }
+            if percent >= threshold {
+                guard !notifiedMetricKeys.contains(key) else { continue }
+                notifiedMetricKeys.insert(key)
+                NotificationManager.send(
+                    title: "AiSentry",
+                    body: "\(displayName) — \(metric.label): \(Int(percent.rounded()))%"
+                )
+            } else {
+                notifiedMetricKeys.remove(key)
+            }
         }
     }
 
