@@ -25,6 +25,10 @@ struct SettingsView: View {
                 Text("AiSentry è gratis. Se ti torna utile, sentiti libero di [offrirmi un caffè ☕](https://ko-fi.com/gaskb).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+
+                Text("Versione \(AppVersion.string)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
             }
             .formStyle(.grouped)
             .padding()
@@ -64,17 +68,22 @@ private struct ProviderSettingsTab: View {
 
                 Section("Credenziali") {
                     ForEach(status.source.requiredFields, id: \.key) { field in
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(field.label)
+                                .font(.subheadline)
+                                .bold()
                             if field.kind == .secret {
-                                SecureField(field.label, text: binding(for: field))
+                                SecureField(field.placeholder, text: binding(for: field))
+                                    .textFieldStyle(.roundedBorder)
                             } else {
-                                TextField(field.label, text: binding(for: field))
+                                TextField(field.placeholder, text: binding(for: field))
+                                    .textFieldStyle(.roundedBorder)
                             }
                             Text(field.helpText)
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                         }
-                        .padding(.vertical, 2)
+                        .padding(.vertical, 4)
                     }
                 }
 
@@ -101,6 +110,7 @@ private struct ProviderSettingsTab: View {
                     }
 
                     Button(isRefreshing ? "Verifica…" : "Verifica ora") {
+                        saveAllFields()
                         Task {
                             isRefreshing = true
                             await monitor.refresh(providerId: providerId)
@@ -114,16 +124,38 @@ private struct ProviderSettingsTab: View {
         .formStyle(.grouped)
         .padding()
         .onAppear(perform: load)
+        .onDisappear(perform: saveAllFields)
     }
 
+    /// Only touches @State while typing — writing to Keychain on every keystroke
+    /// triggered a macOS access-confirmation prompt per character on unsigned/ad-hoc
+    /// dev builds, effectively locking out anyone pasting a long cookie. Persisted
+    /// explicitly instead: on "Verifica ora" and when leaving the tab.
     private func binding(for field: CredentialField) -> Binding<String> {
         Binding(
             get: { fieldValues[field.key] ?? "" },
-            set: { newValue in
-                fieldValues[field.key] = newValue
-                ProviderConfigStore.save(field: field, providerId: providerId, value: newValue)
-            }
+            set: { fieldValues[field.key] = $0 }
         )
+    }
+
+    private func saveAllFields() {
+        guard let status else { return }
+        for field in status.source.requiredFields {
+            let value = fieldValues[field.key] ?? ""
+            ProviderConfigStore.save(field: field, providerId: providerId, value: normalize(value, for: field))
+        }
+    }
+
+    /// Forgiving of a common copy-paste mistake: selecting the whole "Cookie: xxx"
+    /// header line (name included) instead of just the value.
+    private func normalize(_ value: String, for field: CredentialField) -> String {
+        var trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if field.key == "cookie" {
+            for prefix in ["cookie:", "Cookie:"] where trimmed.hasPrefix(prefix) {
+                trimmed = trimmed.dropFirst(prefix.count).trimmingCharacters(in: .whitespaces)
+            }
+        }
+        return trimmed
     }
 
     private func load() {
