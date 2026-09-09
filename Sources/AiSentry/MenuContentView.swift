@@ -23,8 +23,8 @@ struct MenuContentView: View {
             }
 
             Button("Impostazioni…") {
-                NSApp.activate(ignoringOtherApps: true)
                 openSettings()
+                bringSettingsWindowToFront()
             }
             .keyboardShortcut(",")
 
@@ -35,6 +35,22 @@ struct MenuContentView: View {
             }
         }
         .padding(4)
+    }
+
+    /// `openSettings()` alone leaves the window visible but not "key" when launched
+    /// as a menu-bar-only app that was never the frontmost app (e.g. via `swift run`
+    /// from Terminal) — clicks land, but the keyboard/paste never reaches the fields.
+    /// Forcing activation + makeKey after SwiftUI has had a beat to create the window
+    /// works around it.
+    private func bringSettingsWindowToFront() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            NSApp.activate(ignoringOtherApps: true)
+            let settingsWindow = NSApp.windows.first {
+                $0.identifier?.rawValue.contains("Settings") == true
+            } ?? NSApp.windows.first { $0.canBecomeKey }
+            settingsWindow?.makeKeyAndOrderFront(nil)
+            settingsWindow?.orderFrontRegardless()
+        }
     }
 }
 
