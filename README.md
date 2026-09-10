@@ -47,6 +47,22 @@ Il cookie scade periodicamente (dipende dal provider): quando una fonte inizia a
 
 Per OpenAI serve invece una **Admin API key** vera e propria, da creare su platform.openai.com → Settings → Admin keys (richiede il ruolo owner dell'organizzazione).
 
+## Installazione
+
+Non notarizzata (nessun account Apple Developer ID configurato) e non ancora pubblicata come release scaricabile — per ora si costruisce ed installa localmente:
+
+```bash
+./Scripts/build_dmg.sh
+```
+
+Apre `dist/AiSentry-<versione>.dmg`; monta l'immagine e trascina AiSentry.app in Applications, oppure direttamente:
+
+```bash
+cp -R dist/AiSentry.app /Applications/
+```
+
+Al primo avvio da Finder/Launchpad, macOS segnala l'app come da sviluppatore non identificato: tasto destro su AiSentry in Applications → **Apri** → conferma nella finestra di dialogo. Serve una volta sola. Da lì in poi si apre normalmente con un doppio click, senza bisogno di lanciarla da terminale.
+
 ## Sviluppo
 
 ```bash
@@ -54,7 +70,9 @@ swift build
 swift run
 ```
 
-Per un bundle `.app` distribuibile (firmato ad-hoc, non notarizzato):
+`swift run` è comodo per iterare rapidamente, ma lanciata così l'app non riceve mai il focus da tastiera se il processo che la avvia (terminale, tool di automazione) non è considerato "in primo piano" da macOS — i click sui campi arrivano, la tastiera no. Per un test realistico usa il bundle `.app` installato con `build_dmg.sh`/`build_app.sh` invece di `swift run`.
+
+Per costruire solo il bundle `.app` (senza impacchettarlo in un DMG):
 
 ```bash
 ./Scripts/build_app.sh
