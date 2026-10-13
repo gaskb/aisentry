@@ -19,7 +19,7 @@ struct AboutView: View {
                 .font(.callout)
                 .frame(maxWidth: 280)
 
-            Link("Repository", destination: URL(string: "https://gitlab.gaskb.net/root/aisentry")!)
+            Link("Repository", destination: URL(string: "https://github.com/gaskb/aisentry")!)
                 .font(.callout)
 
             supportText
