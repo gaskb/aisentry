@@ -5,7 +5,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![macOS: 14+](https://img.shields.io/badge/macOS-14%2B-lightgrey.svg)](https://www.apple.com/macos/)
 [![Swift](https://img.shields.io/badge/Swift-5.9%2B-orange.svg)](https://swift.org)
-[![Ko-fi](https://img.shields.io/badge/Support_on-Ko--fi-FF5E5B?style=flat&logo=kofi&logoColor=white)](https://ko-fi.com/gaskb)
 
 A lightweight macOS menu bar app that shows, at a single glance, how much you have consumed of your AI plans and APIs: Claude, OpenAI, Gemini, and Grok, designed with a modular architecture to easily add more.
 
@@ -39,7 +38,7 @@ Anti-CSRF tokens, session IDs (`f.sid`), and build labels are parsed dynamically
 
 ## How It Works
 
-- **Swift + SwiftUI**, using `MenuBarExtra` (macOS 14+), following the same architecture as [PingSentry](https://github.com/gaskb/pingsentry).
+- **Swift + SwiftUI**, using native `MenuBarExtra` (macOS 14+).
 - Every provider conforms to the `UsageSource` protocol (`Sources/AiSentry/Core/UsageModels.swift`): declares required credential fields (cookie, API key, org ID, budget) and returns a list of `UsageMetric` (percentage + textual details).
 - `UsageMonitor` queries all active sources in parallel at regular intervals (default: 10 minutes, user-configurable) and maintains reactive state for the UI.
 - The Settings window dynamically renders configuration forms based on each provider's declared requirements—adding a new provider requires zero UI changes, simply adding a new `UsageSource` file under `Sources/AiSentry/Providers/`.
@@ -127,7 +126,7 @@ Il token anti-CSRF, il session ID (`f.sid`) e il build label sono letti dinamica
 
 ## Come funziona
 
-- **Swift + SwiftUI**, con `MenuBarExtra` (macOS 14+), stessa impostazione di [PingSentry](https://github.com/gaskb/pingsentry).
+- **Swift + SwiftUI**, con `MenuBarExtra` nativo (macOS 14+).
 - Ogni provider implementa il protocollo `UsageSource` (`Sources/AiSentry/Core/UsageModels.swift`): dichiara i campi che gli servono (cookie, API key, ID organizzazione, budget) e restituisce una lista di `UsageMetric` (percentuale + dettaglio testuale).
 - `UsageMonitor` interroga tutte le fonti abilitate in parallelo a intervalli regolari (default 10 minuti, configurabile) e tiene lo stato per la UI.
 - Le Impostazioni generano automaticamente un form per ogni provider a partire dai campi richiesti: aggiungere un nuovo provider non tocca la UI, basta un nuovo file in `Sources/AiSentry/Providers/` che conforma `UsageSource`.
